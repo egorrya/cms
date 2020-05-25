@@ -2,12 +2,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const hbs = require("express-handlebars");
+const { mongoDbUrl } = require("./config/configuration");
 
 const app = express();
 
 // Configure Mongoose to connect to MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/cms", { useNewUrlParser: true })
+  .connect(mongoDbUrl, { useNewUrlParser: true })
   .then((response) => {
     console.log("Database connected successfully");
   })
@@ -20,8 +22,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Setup View Engine (Handlebars)
+app.engine("handlebars", hbs({ defaultLayout: "default" }));
+app.set("view engine", "handlebars");
+
 // Routes
-app.use("/", (req, res) => {});
+app.use("/", (req, res) => {
+  res.render("default/index");
+});
 
 // Running a server
 app.listen(3000, () => {
